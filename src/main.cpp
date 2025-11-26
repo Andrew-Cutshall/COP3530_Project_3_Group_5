@@ -51,7 +51,8 @@ int main() {
         SQLite::Database db("assets/movieData.db", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
         std::cout << "Database opened successfully!" << std::endl;
         setupDatabase(db);
-        runCollectionLoop(db);
+		//runCollectionLoop(db); //(Andrew) Running on my pc, commented out for others
+        std::cout << "Total Actor Count: " << getTotalActors(db) << std::endl;
     }
     catch (const std::exception& e) {
         std::cerr << "\nCRITICAL ERROR: Application terminated due to database failure: " << e.what() << std::endl;

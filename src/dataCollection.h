@@ -214,3 +214,17 @@ void runCollectionLoop(SQLite::Database& db) {
 	}
 	std::cout << "\n--- Full Catalog Movie Data Collection Complete ---" << std::endl;
 }
+
+// Get's the total amount of unique actors in the database
+int getTotalActors(SQLite::Database& db) {
+	try {
+		SQLite::Statement query(db, "SELECT COUNT(actor_id) FROM Actors;");
+		if (query.executeStep()) {
+			return query.getColumn(0).getInt();
+		}
+	}
+	catch (std::exception& e) {
+		std::cerr << "SQL error when counting actors: " << e.what() << std::endl;
+	}
+	return 1;
+}
