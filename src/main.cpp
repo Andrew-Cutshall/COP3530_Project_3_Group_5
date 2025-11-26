@@ -22,7 +22,6 @@
 #include "graph.h"
 #include "bfh.h"
 #include "dijkstra.h"
-#include "apiKey.h"
 #include "otherFunctions.h"
 #include "dataCollection.h"
 
@@ -48,8 +47,17 @@
 
 //Main function
 int main() {
-	std::cout << "Hello World!" << std::endl;
-	return 0;
+    try {
+        SQLite::Database db("assets/movieData.db", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
+        std::cout << "Database opened successfully!" << std::endl;
+        setupDatabase(db);
+        runCollectionLoop(db);
+    }
+    catch (const std::exception& e) {
+        std::cerr << "\nCRITICAL ERROR: Application terminated due to database failure: " << e.what() << std::endl;
+        return 1;
+    }
+    return 0;
 }
 
 
