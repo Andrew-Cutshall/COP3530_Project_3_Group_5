@@ -1,5 +1,0 @@
-{
-	"// NOTE" : "Rename to config.cfg   (remove the .template)",
-	"tmdb_api_key": "PUT API HERE",
-	"_TODO" : "Add more config settings here"
-}
