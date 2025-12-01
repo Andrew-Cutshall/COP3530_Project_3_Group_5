@@ -394,7 +394,13 @@ void pullLatestFromGit(const std::string& yearFile) {
 }
 
 bool tryPushToGit(const std::string& yearFile, const std::string& commitCommand, const std::string& dbFilePath) {
-	std::string addCommand = std::format("git add {} {} 2>&1", yearFile, dbFilePath);
+	std::string addCommand;
+	if (!dbFilePath.empty()) {
+		addCommand = std::format("git add {} {} 2>&1", yearFile, dbFilePath);
+	}
+	else {
+		addCommand = std::format("git add {} 2>&1", yearFile);
+	}
 	std::system(addCommand.c_str());
 	int commitResult = std::system(commitCommand.c_str());
 	if (commitResult != 0) {
@@ -459,7 +465,7 @@ void runWorker(const std::string& yearStatusFile) {
 		}
 		std::string claimMessage = std::format("[CLAIM] Year {} as IN_PROGRESS", claimedYear); //Git commit message for claiming
 		std::string claimCommand = std::format("git commit -m \"{}\" 2>&1", claimMessage);
-		if (!tryPushToGit(yearStatusFile, claimCommand)) {
+		if (!tryPushToGit(yearStatusFile, claimCommand, "")) {
 			std::cerr << "Lock acquisition failed for year " << claimedYear << ". Restarting cycle.\n";
 			continue;
 		}
