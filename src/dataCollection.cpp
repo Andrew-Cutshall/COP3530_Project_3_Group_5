@@ -168,7 +168,7 @@ void saveMovieData(SQLite::Database& db, int movieID, const std::string& title, 
 //Saves movie to a Database, requires Movie ID and the Database to be specified
 void processMovie(SQLite::Database& db, int movieID) {
 	std::string movieURL = buildMovieURL(movieID);
-	std::this_thread::sleep_for(std::chrono::milliseconds(277)); //Request will be optimized to still give headroom, 3.6 request per second at 277 milliseconds
+	std::this_thread::sleep_for(std::chrono::milliseconds(320)); //Request will be optimized to still give headroom, 3.6 request per second at 277 milliseconds
 	std::string movieResponse = curlRequest(movieURL);
 	try {
 		json movieData = json::parse(movieResponse);
@@ -218,7 +218,7 @@ void runCollectionLoop(SQLite::Database& db,int year) {
 		std::string url = buildDiscoverURL(page, year); //URL Production
 		std::cout << std::format("Fetching Page {} of year {}.\n", page, year);
 		std::string jsonResponse = curlRequest(url);
-		std::this_thread::sleep_for(std::chrono::milliseconds(277)); //Request will be optimized to still give headroom, 3.6 request per second at 277 milliseconds
+		std::this_thread::sleep_for(std::chrono::milliseconds(320));
 		if (jsonResponse.empty()) {
 			std::cerr << "Failed to retrieve page " << page << std::endl;
 			break;
