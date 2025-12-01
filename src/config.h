@@ -13,6 +13,8 @@
 #include <stop_token>
 #include <chrono>
 
+#include "dataCollection.h"
+
 using json = nlohmann::json;
 
 namespace Config {

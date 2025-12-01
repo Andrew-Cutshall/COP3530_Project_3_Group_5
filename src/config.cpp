@@ -13,12 +13,16 @@
 #include <chrono>
 
 #include "config.h"
+#include "dataCollection.h"
 
 
 
 namespace Config {
-
 	const std::string TMDB_API_KEY = [] {
+		if (!changeToGitRoot()) {
+			std::cerr << "FATAL: Could not access Git directory. Aborting worker.\n";
+			exit(1);
+		}
 		try {
 			std::ifstream file("assets/config.cfg");
 			if (!file.is_open()) {
@@ -32,8 +36,8 @@ namespace Config {
 			return key;
 		}
 		catch (const std::exception& e) {
-			std::cerr << std::format("FATAL Configuration Error: Failed to load TMDB_KEY: {}", e.what());
-			exit;
+			std::cerr << "FATAL Configuration Error: Failed to load TMDB_KEY: " << e.what() << "\n";
+			exit(1);
 		}
 	}();
 

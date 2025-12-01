@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <thread>
 #include "dataCollection.h"
+#include "config.h"
 
 //=====================================================================================
 //=====================================================================================
@@ -308,11 +309,11 @@ std::string curlRequest(const std::string& url) {
 //=====================================================================================
 
 std::string buildDiscoverURL(int pageNumber, int year) {
-	return std::format("https://api.themoviedb.org/3/discover/movie?api_key=43220ed9cc8b8898d0671739929f87e0&include_adult=false&include_video=false&language=en-US&page={}&year={}", pageNumber, year);
+	return std::format("https://api.themoviedb.org/3/discover/movie?api_key={}&include_adult=false&include_video=false&language=en-US&page={}&year={}", Config::TMDB_API_KEY, pageNumber, year);
 }
 
 std::string buildMovieURL(int movieID) {
-	return std::format("https://api.themoviedb.org/3/movie/{}?api_key=43220ed9cc8b8898d0671739929f87e0&append_to_response=credits", std::to_string(movieID));
+	return std::format("https://api.themoviedb.org/3/movie/{}?api_key={}&append_to_response=credits", std::to_string(movieID), Config::TMDB_API_KEY);
 }
 
 //Add Actor URL builder later here for image urls
@@ -452,10 +453,6 @@ bool changeToGitRoot() {
 //=====================================================================================
 
 void runWorker(const std::string& yearStatusFile) {
-	if (!changeToGitRoot()) {
-		std::cerr << "FATAL: Could not access Git directory. Aborting worker.\n";
-		return;
-	}
 	while (true) {
 		std::this_thread::sleep_for(std::chrono::seconds(2)); //Delay to avoid loop spam
 		pullLatestFromGit(yearStatusFile);
