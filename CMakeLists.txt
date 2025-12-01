@@ -2,7 +2,6 @@
 project(COP3530_Project_3_Group_5 LANGUAGES CXX)
 include_directories(include)
 
-
 # Define Source Files
 set(SOURCE_FILES
     "src/window.cpp"

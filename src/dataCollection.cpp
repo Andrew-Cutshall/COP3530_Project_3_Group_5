@@ -168,10 +168,23 @@ void saveMovieData(SQLite::Database& db, int movieID, const std::string& title, 
 //Saves movie to a Database, requires Movie ID and the Database to be specified
 void processMovie(SQLite::Database& db, int movieID) {
 	std::string movieURL = buildMovieURL(movieID);
-	std::this_thread::sleep_for(std::chrono::milliseconds(320)); //Request will be optimized to still give headroom, 3.6 request per second at 277 milliseconds
+	std::this_thread::sleep_for(std::chrono::milliseconds(100)); //Speed :)
 	std::string movieResponse = curlRequest(movieURL);
 	try {
 		json movieData = json::parse(movieResponse);
+		if (movieData.contains("status_code")) {
+			if (movieData.value("status_code", 0) == 429) {
+				std::cout << "OOPS! Too fast!!!!\n";
+				std::this_thread::sleep_for(std::chrono::milliseconds(500)); //Not speed :(
+				movieURL = buildMovieURL(movieID);
+				movieResponse = curlRequest(movieURL);
+				movieData = json::parse(movieResponse);
+			}
+			else {
+				std::cerr << "API Request failed and could not restart!\n";
+				return;
+			}
+		}
 		std::string title = movieData.value("title", "N/A");
 		json castArray = movieData.value("credits", json::object()).value("cast", json::array());
 		saveMovieData(db, movieID, title, castArray);
@@ -218,7 +231,7 @@ void runCollectionLoop(SQLite::Database& db,int year) {
 		std::string url = buildDiscoverURL(page, year); //URL Production
 		std::cout << std::format("Fetching Page {} of year {}.\n", page, year);
 		std::string jsonResponse = curlRequest(url);
-		std::this_thread::sleep_for(std::chrono::milliseconds(320));
+		std::this_thread::sleep_for(std::chrono::milliseconds(100)); //Speed :)
 		if (jsonResponse.empty()) {
 			std::cerr << "Failed to retrieve page " << page << std::endl;
 			break;
@@ -293,6 +306,11 @@ std::string curlRequest(const std::string& url) {
 //									URL Building
 //=====================================================================================
 //=====================================================================================
+
+std::string apiKey1 = "43220ed9cc8b8898d0671739929f87e0";
+
+
+
 std::string buildDiscoverURL(int pageNumber, int year) {
 	return std::format("https://api.themoviedb.org/3/discover/movie?api_key=43220ed9cc8b8898d0671739929f87e0&include_adult=false&include_video=false&language=en-US&page={}&year={}", pageNumber, year);
 }
@@ -392,7 +410,7 @@ void pullLatestFromGit(const std::string& yearFile) {
 		std::cout << "Successfully pulled latest status\n";
 	}
 }
-
+//Push current Database and update Year file, or just updating year file
 bool tryPushToGit(const std::string& yearFile, const std::string& commitCommand, const std::string& dbFilePath) {
 	std::string addCommand;
 	if (!dbFilePath.empty()) {

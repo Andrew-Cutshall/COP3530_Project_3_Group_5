@@ -45,23 +45,54 @@ void processMovie(SQLite::Database& db, int movieID);
 int extractMovieIDs(SQLite::Database& db, const std::string& jsonResponse);
 void runCollectionLoop(SQLite::Database& db, int year);
 
-// Concurrency-Safe Database Open (openYearDataBase is called by workerDataCollection)
+//=====================================================================================
+//=====================================================================================
+//									URL Building
+//=====================================================================================
+//=====================================================================================
+// Basic URL building, API keys are not secured, so it can't be public, mutiple keys are
+// present just as a backup in case there is a limit I couldn't find. - Andrew
+
 SQLite::Database openYearDataBase(int year);
 SQLite::Database openMainDatabase();
 void mergeCollectionAndBuildGraph(SQLite::Database& mainDB, const std::vector<std::string>& filePaths);
 
-// --- Year Status Management Declarations ---
+//=====================================================================================
+//=====================================================================================
+//						 Data Collection Parralelization Logic Declarations
+//=====================================================================================
+//=====================================================================================
+// Includes filehandling and console output for running off of multiple computers at once
+// Super cool and simple method of having multiple machines working on the same database
+// A CSV is created, which contains the codes listed in enum. At the start, every worker
+// makes sure that it is in the root directory, and then does a fresh pull. It then checks
+// for the first year that is NOT_STARTED and tries to claim it. It edits the CSV, then tries
+// to push it, if it fails, it searches again, otherwise it get's a confirmed push, and then 
+// starts building the database for that year. Once it finishes, it writes to the CSV again,
+// then pushes that and the database. 
+// This was a very fun section to work on, and I spent around 7 hours between researching 
+// and fixing broken logic, but I think it's worth it. - Andrew
+
+//=====================================================================================
+//								Year Status Management Declarations
+//=====================================================================================
 yearStatus* findYear(std::vector<yearStatus>& years, int year);
 std::vector<yearStatus> loadYearStatus(const std::string& filename);
 int saveYearStatus(const std::string& filename, const std::vector<yearStatus>& years);
 
-// --- GitHub File Management Declarations ---
+//=====================================================================================
+//							GitHub File Management Declarations
+//=====================================================================================
 void pullLatestFromGit(const std::string& yearFile);
 bool tryPushToGit(const std::string& yearFile, const std::string& commitCommand, const std::string& dbFilePath);
 
-// --- Worker/Execution Logic Declarations ---
+//=====================================================================================
+//								Worker Logic Declarations
+//=====================================================================================
+
 bool changeToGitRoot();
 bool workerDataCollection(int year);
 void runWorker(const std::string& yearStatusFile);
 
-#endif // DATACOLLECTION_H
+//End of Declarations
+#endif
