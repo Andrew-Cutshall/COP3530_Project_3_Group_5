@@ -2,18 +2,14 @@
 project(COP3530_Project_3_Group_5 LANGUAGES CXX)
 include_directories(include)
 
+
 # Define Source Files
 set(SOURCE_FILES
-    "src/window.h"
     "src/window.cpp"
-    "src/bfh.h"
     "src/bfh.cpp"
-    "src/dijkstra.h"
     "src/dijkstra.cpp"
-    "src/otherFunctions.h"
-    "src/dataCollection.h"
-    "src/graph.h"
     "src/graph.cpp"
+    "src/dataCollection.cpp"
 )
 
 #Set Output Directory
@@ -65,6 +61,7 @@ find_package(CURL REQUIRED)
 
 #Build Executable
 add_executable(main "src/main.cpp" ${SOURCE_FILES}) 
+target_compile_definitions(main PRIVATE GIT_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_features(main PRIVATE cxx_std_23)
 target_link_libraries(main PRIVATE
     CURL::libcurl

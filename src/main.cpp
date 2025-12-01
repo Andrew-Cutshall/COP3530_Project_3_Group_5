@@ -47,17 +47,9 @@
 
 //Main function
 int main() {
-    try {
-        SQLite::Database db("assets/movieData.db", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
-        std::cout << "Database opened successfully!" << std::endl;
-        setupDatabase(db);
-        std::cout << "Total Actor Count: " << getTotalActors(db) << std::endl;
-    }
-    catch (const std::exception& e) {
-        std::cerr << "\nCRITICAL ERROR: Application terminated due to database failure: " << e.what() << std::endl;
-        return 1;
-    }
-    return 0;
+	const std::string yearPath = "assets/yearStatus.csv";
+	runWorker(yearPath);
+	return 0;
 }
 
 
