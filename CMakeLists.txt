@@ -19,11 +19,6 @@ if (MSVC)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")
 endif ()
 
-# Copies over assets folder
-file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets"
-    DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/"
-)
-
 #For Graphics
 find_package(SFML QUIET)
 if (NOT SFML_FOUND)
