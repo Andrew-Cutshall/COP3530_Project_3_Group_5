@@ -375,11 +375,11 @@ int saveYearStatus(const std::string& filename, const std::vector<yearStatus>& y
 //								GitHub File Management
 //=====================================================================================
 
-const std::string GIT_BRANCH = "main";
+const std::string GIT_BRANCH = "master";
 
 //Pull latest
 void pullLatestFromGit(const std::string& yearFile) {
-	std::string command = std::format("git pull origin {} --rebase 2>&1 || true", GIT_BRANCH);
+	std::string command = std::format("git pull origin {} --rebase 2>&1", GIT_BRANCH);
 	int result = std::system(command.c_str());
 	if (result != 0) {
 		std::cerr << "Git pull failed with error code: " << result << std::endl;
