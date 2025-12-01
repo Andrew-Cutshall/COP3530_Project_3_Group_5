@@ -54,7 +54,7 @@ FetchContent_MakeAvailable(sqlite_cpp)
 find_package(CURL REQUIRED)
 
 #Build Executable
-add_executable(main "src/main.cpp" ${SOURCE_FILES}) 
+add_executable(main "src/main.cpp" ${SOURCE_FILES} "src/config.h" "src/config.cpp") 
 target_compile_definitions(main PRIVATE GIT_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_features(main PRIVATE cxx_std_23)
 target_link_libraries(main PRIVATE

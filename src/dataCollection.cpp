@@ -307,10 +307,6 @@ std::string curlRequest(const std::string& url) {
 //=====================================================================================
 //=====================================================================================
 
-std::string apiKey1 = "43220ed9cc8b8898d0671739929f87e0";
-
-
-
 std::string buildDiscoverURL(int pageNumber, int year) {
 	return std::format("https://api.themoviedb.org/3/discover/movie?api_key=43220ed9cc8b8898d0671739929f87e0&include_adult=false&include_video=false&language=en-US&page={}&year={}", pageNumber, year);
 }
