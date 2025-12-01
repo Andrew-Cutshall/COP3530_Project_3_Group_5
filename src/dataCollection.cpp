@@ -393,8 +393,8 @@ void pullLatestFromGit(const std::string& yearFile) {
 	}
 }
 
-bool tryPushToGit(const std::string& yearFile, const std::string& commitCommand) {
-	std::string addCommand = std::format("git add {} 2>&1", yearFile);
+bool tryPushToGit(const std::string& yearFile, const std::string& commitCommand, const std::string& dbFilePath) {
+	std::string addCommand = std::format("git add {} {} 2>&1", yearFile, dbFilePath);
 	std::system(addCommand.c_str());
 	int commitResult = std::system(commitCommand.c_str());
 	if (commitResult != 0) {
@@ -481,7 +481,7 @@ void runWorker(const std::string& yearStatusFile) {
 			std::string finalStatus = (yearToProcess->status == COMPLETED) ? "COMPLETED" : "FAILED";
 			std::string finalMsg = std::format("[{}] Year {} as {}", success ? "DONE" : "FAIL", claimedYear, finalStatus);
 			std::string finalCommand = std::format("git commit -m \"{}\" 2>&1", finalMsg);
-			tryPushToGit(yearStatusFile, finalCommand);
+			tryPushToGit(yearStatusFile, finalCommand, std::format("assets/year_{}.db", claimedYear));
 		}
 		else {
 			std::cerr << "CRITICAL ERROR: Year " << claimedYear << " disappeared from status file during processing!\n";

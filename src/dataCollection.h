@@ -57,7 +57,7 @@ int saveYearStatus(const std::string& filename, const std::vector<yearStatus>& y
 
 // --- GitHub File Management Declarations ---
 void pullLatestFromGit(const std::string& yearFile);
-bool tryPushToGit(const std::string& yearFile, const std::string& commitCommand);
+bool tryPushToGit(const std::string& yearFile, const std::string& commitCommand, const std::string& dbFilePath);
 
 // --- Worker/Execution Logic Declarations ---
 bool changeToGitRoot();
