@@ -168,10 +168,23 @@ void saveMovieData(SQLite::Database& db, int movieID, const std::string& title, 
 //Saves movie to a Database, requires Movie ID and the Database to be specified
 void processMovie(SQLite::Database& db, int movieID) {
 	std::string movieURL = buildMovieURL(movieID);
-	std::this_thread::sleep_for(std::chrono::milliseconds(320)); //Request will be optimized to still give headroom, 3.6 request per second at 277 milliseconds
+	std::this_thread::sleep_for(std::chrono::milliseconds(100)); //Speed :)
 	std::string movieResponse = curlRequest(movieURL);
 	try {
 		json movieData = json::parse(movieResponse);
+		if (movieData.contains("status_code")) {
+			if (movieData.value("status_code", 0) == 429) {
+				std::cout << "OOPS! Too fast!!!!\n";
+				std::this_thread::sleep_for(std::chrono::milliseconds(500)); //Not speed :(
+				movieURL = buildMovieURL(movieID);
+				movieResponse = curlRequest(movieURL);
+				movieData = json::parse(movieResponse);
+			}
+			else {
+				std::cerr << "API Request failed and could not restart!\n";
+				return;
+			}
+		}
 		std::string title = movieData.value("title", "N/A");
 		json castArray = movieData.value("credits", json::object()).value("cast", json::array());
 		saveMovieData(db, movieID, title, castArray);
@@ -218,7 +231,7 @@ void runCollectionLoop(SQLite::Database& db,int year) {
 		std::string url = buildDiscoverURL(page, year); //URL Production
 		std::cout << std::format("Fetching Page {} of year {}.\n", page, year);
 		std::string jsonResponse = curlRequest(url);
-		std::this_thread::sleep_for(std::chrono::milliseconds(320));
+		std::this_thread::sleep_for(std::chrono::milliseconds(100)); //Speed :)
 		if (jsonResponse.empty()) {
 			std::cerr << "Failed to retrieve page " << page << std::endl;
 			break;
@@ -293,6 +306,7 @@ std::string curlRequest(const std::string& url) {
 //									URL Building
 //=====================================================================================
 //=====================================================================================
+
 std::string buildDiscoverURL(int pageNumber, int year) {
 	return std::format("https://api.themoviedb.org/3/discover/movie?api_key=43220ed9cc8b8898d0671739929f87e0&include_adult=false&include_video=false&language=en-US&page={}&year={}", pageNumber, year);
 }
@@ -392,9 +406,15 @@ void pullLatestFromGit(const std::string& yearFile) {
 		std::cout << "Successfully pulled latest status\n";
 	}
 }
-
-bool tryPushToGit(const std::string& yearFile, const std::string& commitCommand) {
-	std::string addCommand = std::format("git add {} 2>&1", yearFile);
+//Push current Database and update Year file, or just updating year file
+bool tryPushToGit(const std::string& yearFile, const std::string& commitCommand, const std::string& dbFilePath) {
+	std::string addCommand;
+	if (!dbFilePath.empty()) {
+		addCommand = std::format("git add {} {} 2>&1", yearFile, dbFilePath);
+	}
+	else {
+		addCommand = std::format("git add {} 2>&1", yearFile);
+	}
 	std::system(addCommand.c_str());
 	int commitResult = std::system(commitCommand.c_str());
 	if (commitResult != 0) {
@@ -459,7 +479,7 @@ void runWorker(const std::string& yearStatusFile) {
 		}
 		std::string claimMessage = std::format("[CLAIM] Year {} as IN_PROGRESS", claimedYear); //Git commit message for claiming
 		std::string claimCommand = std::format("git commit -m \"{}\" 2>&1", claimMessage);
-		if (!tryPushToGit(yearStatusFile, claimCommand)) {
+		if (!tryPushToGit(yearStatusFile, claimCommand, "")) {
 			std::cerr << "Lock acquisition failed for year " << claimedYear << ". Restarting cycle.\n";
 			continue;
 		}
@@ -481,7 +501,7 @@ void runWorker(const std::string& yearStatusFile) {
 			std::string finalStatus = (yearToProcess->status == COMPLETED) ? "COMPLETED" : "FAILED";
 			std::string finalMsg = std::format("[{}] Year {} as {}", success ? "DONE" : "FAIL", claimedYear, finalStatus);
 			std::string finalCommand = std::format("git commit -m \"{}\" 2>&1", finalMsg);
-			tryPushToGit(yearStatusFile, finalCommand);
+			tryPushToGit(yearStatusFile, finalCommand, std::format("assets/year_{}.db", claimedYear));
 		}
 		else {
 			std::cerr << "CRITICAL ERROR: Year " << claimedYear << " disappeared from status file during processing!\n";
