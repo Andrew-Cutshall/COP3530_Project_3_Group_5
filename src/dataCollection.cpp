@@ -16,6 +16,47 @@
 #include "dataCollection.h"
 #include "config.h"
 
+
+std::unordered_map<int, ActorData> loadActorDataFromDB(SQLite::Database& db) {
+	std::unordered_map<int, ActorData> actorDataMap;
+	int actorCount = 0;
+	int edgeCount = 0;
+	try {
+		std::cout << "Loading actors (nodes) from the 'Actors' table...\n";
+		{
+			//Does Actor
+			SQLite::Statement actorQuery(db, "SELECT actor_id, actor_name FROM Actors");
+			while (actorQuery.executeStep()) {
+				int id = actorQuery.getColumn(0).getInt();
+				std::string name = actorQuery.getColumn(1).getString();
+				actorDataMap.emplace(id, ActorData{ name, {} });
+				actorCount++;
+			}
+		} 
+		std::cout << "Loading edges (connections) from the 'Actor_Edges' table...\n";
+		{
+			//Does Edges second
+			SQLite::Statement edgeQuery(db, "SELECT actor1_id, actor2_id, weight FROM Actor_Edges");
+			while (edgeQuery.executeStep()) {
+				int actor1ID = edgeQuery.getColumn(0).getInt();
+				int actor2ID = edgeQuery.getColumn(1).getInt();
+				int weight = edgeQuery.getColumn(2).getInt();
+				actorDataMap.at(actor1ID).edges.emplace_back(actor2ID, weight);
+				actorDataMap.at(actor2ID).edges.emplace_back(actor1ID, weight);
+				edgeCount++;
+			}
+		} 
+		std::cout << std::format("Graph Loaded with {} actors and {} edges!\n",actorCount, edgeCount);
+	}
+	catch (const std::exception& e) {
+		std::cerr << std::format("Error during graph loading: {} \n", e.what());
+		throw;
+	}
+	return actorDataMap;
+}
+
+
+
 //=====================================================================================
 //=====================================================================================
 //									 URL Stuff

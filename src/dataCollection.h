@@ -30,6 +30,16 @@ struct yearStatus {
 	int status; // Uses statusCodes enum values
 };
 
+//Struct for actors
+struct ActorData {
+	std::string name;
+	std::vector<std::pair<int, int>> edges; // pair is <actorID, weight>, for co actor edges.
+};
+
+//Functions for data interaction
+std::unordered_map<int, ActorData> loadActorDataFromDB(SQLite::Database& db);
+
+
 // --- URL Building Declarations ---
 std::string buildDiscoverURL(int pageNumber, int year);
 std::string buildMovieURL(int movieID);
