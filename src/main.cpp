@@ -58,10 +58,11 @@ int main() {
 	//SQLite::Database db = openMainDatabase();
 	//loadActorDataFromDB(db);
 
-	/*
+	
 	//Data Collection Code - Uncomment to run data collection separately
 	const std::string yearPath = "assets/yearStatus.csv";
 	runWorker(yearPath);
+	/*
 	============================================================
 	//referenced https://www.sfml-dev.org/
 	//Color Palette: https://colorswall.com/palette/27237
@@ -72,7 +73,7 @@ int main() {
 	if (mainWindow.loadAllResources() == 0) {
 		std::cout << "All Resources Loaded!\n";
 	}
-
+	/*
 	while (window.isOpen())
 	{
 		while (const std::optional event = window.pollEvent())
@@ -81,7 +82,9 @@ int main() {
 				window.close();
 		}
 		window.clear();
-
+		if (mainWindow.leftMouseClicked()) {
+			std::cout << "Left Mouse Clicked at: " << sf::Mouse::getPosition(window).x << ", " << sf::Mouse::getPosition(window).y << "\n";
+		}
 		mainWindow.renderMainMenu();
 
 		window.display();
@@ -89,6 +92,7 @@ int main() {
 		
 
 	}
+	*/
 	return 0;
 }
 

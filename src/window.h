@@ -27,7 +27,7 @@ public:
 
 	sf::RenderTexture& renderMainMenuTexture();
 
-
+	//std::tuple<sf::Sprite, sf::Text, sf::FloatRect> drawTextBox(int x, int y, std::string input);
 	sf::Vector2f getMousePosition();
 	//Checks and returns whether left and right mouse button is clicked.
 	bool leftMouseClicked();

@@ -28,6 +28,8 @@ Window::Window(sf::RenderWindow& setWindow) : mainWindow(setWindow) {
     float xScreenResolution = windowSize.x;
     float yScreenResolution = windowSize.y;
     scale = (float)xScreenResolution / (float)yScreenResolution;
+	leftClick = false;
+	rightClick = false;
 }
 
 int Window::loadAllResources() {
@@ -110,12 +112,6 @@ sf::RenderTexture& Window::renderMainMenuTexture() {
     clapper.setScale(sf::Vector2f(scale + 1.0f, scale + 1.0f));
     clapper.setPosition(sf::Vector2f(0, 0));
 
-    sf::RectangleShape topActorRectangle({ 500.f, 50.f });
-    topActorRectangle.setFillColor(sf::Color(0, 41, 82));
-    topActorRectangle.setOutlineThickness(10);
-    topActorRectangle.setOutlineColor(sf::Color(0, 82, 163));
-    topActorRectangle.setPosition(sf::Vector2f(size.x / 20, size.y / 5));
-
     sf::RectangleShape botActorRectangle({ 500.f, 50.f });
     botActorRectangle.setFillColor(sf::Color(0, 41, 82));
     botActorRectangle.setOutlineThickness(10);
@@ -151,7 +147,6 @@ sf::RenderTexture& Window::renderMainMenuTexture() {
     drawnTexture.draw(actor1);
     drawnTexture.draw(actor2);
     drawnTexture.draw(clapper);
-    drawnTexture.draw(topActorRectangle);
     drawnTexture.draw(botActorRectangle);
     drawnTexture.draw(resultText);
     drawnTexture.draw(bfsRectangle);
@@ -162,6 +157,18 @@ sf::RenderTexture& Window::renderMainMenuTexture() {
 	drawnTexture.display(); //Don't forget to display the texture after drawing
     return drawnTexture;
 }
+/*
+std::tuple<sf::Sprite, sf::Text, sf::FloatRect> Window::drawTextBox(int x, int y, std::string input) {
+    sf::Vector2u size = windowSize;
+    sf::RectangleShape textBox({ 500.f, 50.f });
+    textBox.setFillColor(sf::Color(0, 41, 82));
+    textBox.setOutlineThickness(10);
+    textBox.setOutlineColor(sf::Color(0, 82, 163));
+    textBox.setPosition(sf::Vector2f(size.x / 20, size.y / 5));
+
+
+}
+*/
 
 sf::Vector2f Window::getMousePosition() {
     mousePosition = sf::Vector2f(sf::Mouse::getPosition(mainWindow));
