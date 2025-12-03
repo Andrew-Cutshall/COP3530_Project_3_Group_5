@@ -51,3 +51,5 @@ void YourWindowClass::renderPaths(Graph& graph, int startId, int endId) {
                sf::Vector2f(10, 40), sf::Color::Red);
 }
 */
+
+
