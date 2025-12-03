@@ -163,7 +163,30 @@ sf::RenderTexture& Window::renderMainMenuTexture() {
     return drawnTexture;
 }
 
+sf::Vector2f Window::getMousePosition() {
+    mousePosition = sf::Vector2f(sf::Mouse::getPosition(mainWindow));
+    return mousePosition;
+}
 
+bool Window::leftMouseClicked() {
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+        leftClick = true;
+    }
+    else {
+        leftClick = false;
+    }
+    return leftClick;
+}
+
+bool Window::rightMouseClicked() {
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
+        rightClick = true;
+    }
+    else {
+        rightClick = false;
+    }
+    return rightClick;
+}
 
 
 

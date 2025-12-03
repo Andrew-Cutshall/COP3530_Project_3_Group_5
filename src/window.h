@@ -28,6 +28,11 @@ public:
 	sf::RenderTexture& renderMainMenuTexture();
 
 
+	sf::Vector2f getMousePosition();
+	//Checks and returns whether left and right mouse button is clicked.
+	bool leftMouseClicked();
+	bool rightMouseClicked();
+
 private:
 	sf::RenderWindow& mainWindow;
 	sf::RenderTexture drawnTexture;
@@ -36,4 +41,8 @@ private:
 	sf::Font scFont;
 	sf::Font bnFont;
 	float scale;
+
+	sf::Vector2f mousePosition;
+	bool leftClick;
+	bool rightClick;
 };
