@@ -34,9 +34,7 @@
 //     bfs.h/cpp	    : Breadth-First Search algorithm implementation
 //     dijkstra.h/cpp   : Dijkstra's algorithm implementation
 //     config.h/cpp     : Handles config settings
-// 
-// -----This file works as it's own program to create the file for data analysis, not used in the main program-----
-//     dataCollection.h : Data collection and file creation from TMDB API, also collects images for use in window
+//     dataCollection.h : Data collection and file creation from TMDB API, also collects images for use in window. Used to manage vector of actors as well.
 // ----------------------------------------------------------------------------------------------------------------
 // 
 // assets/              : All assets used in the program (mostly images for U/I)

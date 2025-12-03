@@ -41,7 +41,10 @@ struct ActorData {
 	std::string name;
 	std::vector<std::pair<int, int>> edges; // pair is <actorID, weight>, for co actor edges.
 };
-std::unordered_map<int, ActorData> loadActorDataFromDB(SQLite::Database& db);
+using ActorGraph = std::pair<std::unordered_map<int, ActorData>, std::unordered_map<std::string, std::vector<int>>>;
+//Big data structure. First is the actorID with their data, second is actor names to a list of IDs, in case of duplicates.
+
+ActorGraph loadActorDataFromDB(SQLite::Database& db);
 
 //=====================================================================================
 //=====================================================================================

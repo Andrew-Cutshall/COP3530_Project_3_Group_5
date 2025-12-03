@@ -22,26 +22,29 @@
 //=====================================================================================
 //=====================================================================================
 
-std::unordered_map<int, ActorData> loadActorDataFromDB(SQLite::Database& db) {
-	std::unordered_map<int, ActorData> actorDataMap;
+ActorGraph loadActorDataFromDB(SQLite::Database& db) {
+	ActorGraph allData;
+	auto& actorDataMap = allData.first;
+	auto& nameToIDMap = allData.second;
+	SQLite::Statement actorQuery(db, "SELECT actor_id, actor_name FROM Actors");
+	SQLite::Statement edgeQuery(db, "SELECT actor1_id, actor2_id, weight FROM Actor_Edges");
 	int actorCount = 0;
 	int edgeCount = 0;
+
 	try {
 		std::cout << "Loading actors from the 'Actors' table...\n";
 		{
-			//Does Actor
-			SQLite::Statement actorQuery(db, "SELECT actor_id, actor_name FROM Actors");
 			while (actorQuery.executeStep()) {
 				int id = actorQuery.getColumn(0).getInt();
 				std::string name = actorQuery.getColumn(1).getString();
 				actorDataMap.emplace(id, ActorData{ name, {} });
+				nameToIDMap[name].push_back(id);
+
 				actorCount++;
 			}
-		} 
+		}
 		std::cout << "Loading edges from the 'Actor_Edges' table...\n";
 		{
-			//Does Edges second
-			SQLite::Statement edgeQuery(db, "SELECT actor1_id, actor2_id, weight FROM Actor_Edges");
 			while (edgeQuery.executeStep()) {
 				int actor1ID = edgeQuery.getColumn(0).getInt();
 				int actor2ID = edgeQuery.getColumn(1).getInt();
@@ -50,14 +53,14 @@ std::unordered_map<int, ActorData> loadActorDataFromDB(SQLite::Database& db) {
 				actorDataMap.at(actor2ID).edges.emplace_back(actor1ID, weight);
 				edgeCount++;
 			}
-		} 
-		std::cout << std::format("Graph Loaded with {} actors and {} edges!\n",actorCount, edgeCount);
+		}
+		std::cout << std::format("Graph Loaded with {} actors and {} edges!\n", actorCount, edgeCount);
 	}
 	catch (const std::exception& e) {
 		std::cerr << std::format("Error during graph loading: {} \n", e.what());
 		throw;
 	}
-	return actorDataMap;
+	return allData;
 }
 
 //=====================================================================================
