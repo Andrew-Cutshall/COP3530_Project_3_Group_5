@@ -84,7 +84,7 @@ const char* SQL_INSERT_LINKS = "INSERT INTO Cast_Links SELECT * FROM subDB.Cast_
 const char* SQL_CALC_EDGES = "INSERT INTO Actor_Edges (actor1_id, actor2_id, weight) SELECT T1.actor_id, T2.actor_id, COUNT(T1.movie_id) AS weight FROM Cast_Links AS T1 JOIN Cast_Links AS T2 ON T1.movie_id = T2.movie_id WHERE T1.actor_id < T2.actor_id GROUP BY T1.actor_id, T2.actor_id HAVING COUNT(T1.movie_id) >= 1;";
 
 //Merges and builds everything. Massive SQLite transaction, with timer, since I like stats - Andrew
-void mergeCollectionAndBuildGraph(SQLite::Database& mainDB, const std::vector<std::string>& filePaths) {
+bool mergeCollectionAndBuildGraph(SQLite::Database& mainDB, const std::vector<std::string>& filePaths) {
 	mainDB.exec("BEGIN TRANSACTION;");
 	auto start = std::chrono::high_resolution_clock::now();
 	try {
@@ -109,8 +109,29 @@ void mergeCollectionAndBuildGraph(SQLite::Database& mainDB, const std::vector<st
 	catch (const std::exception& e) {
 		mainDB.exec("ROLLBACK;");
 		std::cerr << std::format("CRITICAL PROCESS FAILURE: Rollback executed. Error: {} \n", e.what());
+		return false;
 	}
+	return true;
 }
+
+bool combineDatabaseYears(int startYear, int endYear) {
+	SQLite::Database mainDB = openMainDatabase();
+	std::vector<std::string> filePaths;
+	struct stat buffer; //Used for checking if file exist
+	std::string currPath;
+	for (int i = startYear; i <= endYear; ++i) {
+		currPath = std::format("assets/year_{}.db", i);
+		if (stat(currPath.c_str(), &buffer) == 0) {
+			filePaths.push_back(currPath);
+		}
+		else {
+			std::cerr << "Error, file missing or path invalid!\n";
+			return false;
+		}
+	}
+	return mergeCollectionAndBuildGraph(mainDB, filePaths);
+}
+
 
 //Previous database logic, cleaned up, and includes new section for saving the graph into it as well
 void setupDatabase(SQLite::Database& db) {
