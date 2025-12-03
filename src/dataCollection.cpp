@@ -16,13 +16,18 @@
 #include "dataCollection.h"
 #include "config.h"
 
+//=====================================================================================
+//=====================================================================================
+//								Accessing Database Graph
+//=====================================================================================
+//=====================================================================================
 
 std::unordered_map<int, ActorData> loadActorDataFromDB(SQLite::Database& db) {
 	std::unordered_map<int, ActorData> actorDataMap;
 	int actorCount = 0;
 	int edgeCount = 0;
 	try {
-		std::cout << "Loading actors (nodes) from the 'Actors' table...\n";
+		std::cout << "Loading actors from the 'Actors' table...\n";
 		{
 			//Does Actor
 			SQLite::Statement actorQuery(db, "SELECT actor_id, actor_name FROM Actors");
@@ -33,7 +38,7 @@ std::unordered_map<int, ActorData> loadActorDataFromDB(SQLite::Database& db) {
 				actorCount++;
 			}
 		} 
-		std::cout << "Loading edges (connections) from the 'Actor_Edges' table...\n";
+		std::cout << "Loading edges from the 'Actor_Edges' table...\n";
 		{
 			//Does Edges second
 			SQLite::Statement edgeQuery(db, "SELECT actor1_id, actor2_id, weight FROM Actor_Edges");
@@ -54,32 +59,6 @@ std::unordered_map<int, ActorData> loadActorDataFromDB(SQLite::Database& db) {
 	}
 	return actorDataMap;
 }
-
-
-
-//=====================================================================================
-//=====================================================================================
-//									 URL Stuff
-//=====================================================================================
-//=====================================================================================
-// 
-// baseURL = "https://api.themoviedb.org/3/";
-// discoverMovieAddon = "discover/movie?";
-// actorDetailsAddon = "person/{PERSON_ID}?";
-// sortByAddon = "sort_by=popularity.desc";
-// creditsAddon = "apend_to_response=credits";
-// 
-//Examples of complete URLs
-//
-// Get's movies by popularity
-// https://api.themoviedb.org/3/discover/movie?api_key=43220ed9cc8b8898d0671739929f87e0&include_adult=false&include_video=false&language=en-US&page=
-// https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&year=1900'
-//
-// Get's actors for a specific movie
-// https://api.themoviedb.org/3/movie/{MOVIE_ID}?api_key={YOUR_API_KEY}&append_to_response=credits
-//
-// Get's details about a specific actor
-// https://api.themoviedb.org/3/person/{PERSON_ID}?api_key={YOUR_API_KEY}
 
 //=====================================================================================
 //=====================================================================================
@@ -396,7 +375,6 @@ std::string buildMovieURL(int movieID) {
 
 //Add Actor URL builder later here for image urls
 
-
 //=====================================================================================
 //=====================================================================================
 //						 Data Collection Parralelization Logic
@@ -408,7 +386,6 @@ std::string buildMovieURL(int movieID) {
 //=====================================================================================
 //								Year Status Management
 //=====================================================================================
-
 
 //Helper for year status management
 yearStatus* findYear(std::vector<yearStatus>& years, int year) {

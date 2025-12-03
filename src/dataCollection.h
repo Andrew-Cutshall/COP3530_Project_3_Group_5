@@ -30,25 +30,67 @@ struct yearStatus {
 	int status; // Uses statusCodes enum values
 };
 
+//=====================================================================================
+//=====================================================================================
+//								Accessing Database Graph
+//=====================================================================================
+//=====================================================================================
+
 //Struct for actors
 struct ActorData {
 	std::string name;
 	std::vector<std::pair<int, int>> edges; // pair is <actorID, weight>, for co actor edges.
 };
-
-//Functions for data interaction
 std::unordered_map<int, ActorData> loadActorDataFromDB(SQLite::Database& db);
 
+//=====================================================================================
+//=====================================================================================
+//								 	cURL Work
+//=====================================================================================
+//=====================================================================================
 
-// --- URL Building Declarations ---
-std::string buildDiscoverURL(int pageNumber, int year);
-std::string buildMovieURL(int movieID);
-
-// --- cURL Work Declarations ---
 size_t writeCallback(void* contents, size_t size, size_t nmemb, std::string* userp);
 std::string curlRequest(const std::string& url);
 
-// --- Database Work Declarations ---
+//=====================================================================================
+//=====================================================================================
+//									URL Building
+//=====================================================================================
+//=====================================================================================
+
+std::string buildDiscoverURL(int pageNumber, int year);
+std::string buildMovieURL(int movieID);
+
+//=====================================================================================
+//=====================================================================================
+//									 URL Stuff
+//=====================================================================================
+//=====================================================================================
+// 
+// baseURL = "https://api.themoviedb.org/3/";
+// discoverMovieAddon = "discover/movie?";
+// actorDetailsAddon = "person/{PERSON_ID}?";
+// sortByAddon = "sort_by=popularity.desc";
+// creditsAddon = "apend_to_response=credits";
+// 
+//Examples of complete URLs
+//
+// Get's movies by popularity
+// https://api.themoviedb.org/3/discover/movie?api_key=43220ed9cc8b8898d0671739929f87e0&include_adult=false&include_video=false&language=en-US&page=
+// https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&year=1900'
+//
+// Get's actors for a specific movie
+// https://api.themoviedb.org/3/movie/{MOVIE_ID}?api_key={YOUR_API_KEY}&append_to_response=credits
+//
+// Get's details about a specific actor
+// https://api.themoviedb.org/3/person/{PERSON_ID}?api_key={YOUR_API_KEY}
+
+//=====================================================================================
+//=====================================================================================
+//									Database Work
+//=====================================================================================
+//=====================================================================================
+
 void setupDatabase(SQLite::Database& db);
 void saveMovieData(SQLite::Database& db, int movieID, const std::string& title, const json& castArray);
 void processMovie(SQLite::Database& db, int movieID);
@@ -60,8 +102,7 @@ void runCollectionLoop(SQLite::Database& db, int year);
 //									URL Building
 //=====================================================================================
 //=====================================================================================
-// Basic URL building, API keys are not secured, so it can't be public, mutiple keys are
-// present just as a backup in case there is a limit I couldn't find. - Andrew
+// Basic URL building, API keys are secured now - Andrew
 
 SQLite::Database openYearDataBase(int year);
 SQLite::Database openMainDatabase();
@@ -87,6 +128,7 @@ bool combineDatabaseYears(int startYear, int endYear);
 //=====================================================================================
 //								Year Status Management Declarations
 //=====================================================================================
+
 yearStatus* findYear(std::vector<yearStatus>& years, int year);
 std::vector<yearStatus> loadYearStatus(const std::string& filename);
 int saveYearStatus(const std::string& filename, const std::vector<yearStatus>& years);
