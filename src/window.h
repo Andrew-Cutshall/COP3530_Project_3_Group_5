@@ -35,4 +35,5 @@ private:
 	sf::Texture texture;
 	sf::Font scFont;
 	sf::Font bnFont;
+	float scale;
 };

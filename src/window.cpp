@@ -25,6 +25,9 @@
 Window::Window(sf::RenderWindow& setWindow) : mainWindow(setWindow) {
 	windowSize = mainWindow.getSize();
     drawnTexture.resize(windowSize);
+    float xScreenResolution = windowSize.x;
+    float yScreenResolution = windowSize.y;
+    scale = (float)xScreenResolution / (float)yScreenResolution;
 }
 
 int Window::loadAllResources() {
@@ -104,7 +107,7 @@ sf::RenderTexture& Window::renderMainMenuTexture() {
     square[3].color = sf::Color(0, 31, 61);
 
     sf::Sprite clapper(texture);
-    clapper.setScale(sf::Vector2f(0.09, 0.09));
+    clapper.setScale(sf::Vector2f(scale + 1.0f, scale + 1.0f));
     clapper.setPosition(sf::Vector2f(0, 0));
 
     sf::RectangleShape topActorRectangle({ 500.f, 50.f });
