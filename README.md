@@ -15,4 +15,5 @@ HOW TO RUN:
 10. Run the exe that is created
 
 If you are updating to a new pull: Delete the out file folder and rebuild the project by ctrl+S on CmakeLists.txt
+
 (NOTE ON COMMITS: Most commits will be due to the automated collection found in dataCollection, as it sends 2 per year, and has occasionally been bugged, resulting in a lot of commits with a single number change)
