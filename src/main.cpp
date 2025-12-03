@@ -47,12 +47,14 @@
 
 //Main function
 int main() {
-	/*const std::string yearPath = "assets/yearStatus.csv";
-	runWorker(yearPath);*/
-
-
+	/*
+	//Data Collection Code - Uncomment to run data collection separately
+	const std::string yearPath = "assets/yearStatus.csv";
+	runWorker(yearPath);
+	============================================================
 	//referenced https://www.sfml-dev.org/
 	//Color Palette: https://colorswall.com/palette/27237
+	*/
 
 	sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "A Study of Actor Networks: Shortest Hops vs. Strongest Connections", sf::State::Windowed);
 	
@@ -220,10 +222,5 @@ int main() {
 }
 
 
-/*
-//Main 2 is used for interal testing, main() will be handling window creation and logic
-int main2() {
-	std::cout << "Hello World from main2!" << std::endl;
-	return 0;
-}
-*/
+
+
