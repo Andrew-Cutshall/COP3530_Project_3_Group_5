@@ -79,25 +79,38 @@ SQLite::Database openYearDataBase(int year) {
 //Merges all temporary databases to the main one, and creates the graph into it as well
 //The const below are needed for the next function
 
-const char* SQL_INSERT_ACTORS = "INSERT OR IGNORE INTO Actors SELECT * FROM subDB.Actors;";
-const char* SQL_INSERT_LINKS = "INSERT INTO Cast_Links SELECT * FROM subDB.Cast_Links;";
 const char* SQL_CALC_EDGES = "INSERT INTO Actor_Edges (actor1_id, actor2_id, weight) SELECT T1.actor_id, T2.actor_id, COUNT(T1.movie_id) AS weight FROM Cast_Links AS T1 JOIN Cast_Links AS T2 ON T1.movie_id = T2.movie_id WHERE T1.actor_id < T2.actor_id GROUP BY T1.actor_id, T2.actor_id HAVING COUNT(T1.movie_id) >= 1;";
 
 //Merges and builds everything. Massive SQLite transaction, with timer, since I like stats - Andrew
 bool mergeCollectionAndBuildGraph(SQLite::Database& mainDB, const std::vector<std::string>& filePaths) {
 	mainDB.exec("BEGIN TRANSACTION;");
 	auto start = std::chrono::high_resolution_clock::now();
+	std::string currentAttachedDB; // Now only tracks the file path being processed for error reporting
 	try {
 		int databasesCount = 0;
+		SQLite::Statement insertActorsStmt(mainDB, "INSERT OR IGNORE INTO Actors (actor_id, actor_name) VALUES (?, ?);");
+		SQLite::Statement insertLinksStmt(mainDB, "INSERT OR IGNORE INTO Cast_Links (movie_id, actor_id) VALUES (?, ?) ON CONFLICT DO NOTHING;");
 		for (const std::string& path : filePaths) {
 			databasesCount++;
 			std::cout << std::format("Merging file {}/{}: {} \n", databasesCount, filePaths.size(), path);
-			std::string attach = std::format("ATTACH DATABASE '{}' AS subDB;", path);
-			mainDB.exec(attach);
-			mainDB.exec(SQL_INSERT_ACTORS);
-			mainDB.exec(SQL_INSERT_LINKS);
-			mainDB.exec("DETACH DATABASE subDB;");
-		}
+			currentAttachedDB = path;
+			SQLite::Database sourceDB(path, SQLite::OPEN_READONLY);
+			SQLite::Statement selectActorsStmt(sourceDB, "SELECT actor_id, actor_name FROM Actors;");
+			SQLite::Statement selectLinksStmt(sourceDB, "SELECT movie_id, actor_id FROM Cast_Links;");
+			while (selectActorsStmt.executeStep()) {
+				insertActorsStmt.bind(1, selectActorsStmt.getColumn(0).getInt());
+				insertActorsStmt.bind(2, selectActorsStmt.getColumn(1).getString());
+				insertActorsStmt.exec();
+				insertActorsStmt.reset();
+			}
+			while (selectLinksStmt.executeStep()) {
+				insertLinksStmt.bind(1, selectLinksStmt.getColumn(0).getInt());
+				insertLinksStmt.bind(2, selectLinksStmt.getColumn(1).getInt());
+				insertLinksStmt.exec();
+				insertLinksStmt.reset();
+			}
+			currentAttachedDB.clear();
+		} 
 		std::cout << "Done Merging, now starting graph calculation\n";
 		mainDB.exec("DELETE FROM Actor_Edges;");
 		mainDB.exec(SQL_CALC_EDGES);
@@ -107,6 +120,9 @@ bool mergeCollectionAndBuildGraph(SQLite::Database& mainDB, const std::vector<st
 		std::cout << std::format("SUCCESS!! Completed in {} seconds\n", duration.count());
 	}
 	catch (const std::exception& e) {
+		if (!currentAttachedDB.empty()) {
+			std::cerr << "Transfer failed for file: " << currentAttachedDB << std::endl;
+		}
 		mainDB.exec("ROLLBACK;");
 		std::cerr << std::format("CRITICAL PROCESS FAILURE: Rollback executed. Error: {} \n", e.what());
 		return false;
@@ -129,28 +145,7 @@ bool combineDatabaseYears(int startYear, int endYear) {
 			return false;
 		}
 	}
-	bool mergeSuccess = mergeCollectionAndBuildGraph(mainDB, filePaths);
-	if (mergeSuccess) {
-		bool deleteSuccess = true;
-		for (const std::string& path : filePaths) {
-			try {
-				// fs::remove returns true if the file was deleted, false otherwise (e.g., if it didn't exist)
-				if (std::filesystem::remove(path)) {
-					std::cout << "Successfully deleted source file: " << path << std::endl;
-				}
-				else {
-					std::cerr << "Warning: Could not delete source file: " << path << std::endl;
-					deleteSuccess = false; // Note failure but continue
-				}
-			}
-			catch (const std::filesystem::filesystem_error& e) {
-				std::cerr << "CRITICAL FILE DELETION ERROR for " << path << ": " << e.what() << std::endl;
-				return false; 
-			}
-		}
-		return mergeSuccess && deleteSuccess;
-	}
-	return mergeSuccess;
+	return mergeCollectionAndBuildGraph(mainDB, filePaths);
 }
 
 

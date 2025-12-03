@@ -47,6 +47,13 @@
 
 //Main function
 int main() {
+	if (combineDatabaseYears(1900, 2012)) {
+		std::cout << "Database combined successfully.\n";
+	}
+	else {
+		std::cerr << "Error combining database.\n";
+		return 1;
+	}
 	/*
 	//Data Collection Code - Uncomment to run data collection separately
 	const std::string yearPath = "assets/yearStatus.csv";
