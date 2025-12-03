@@ -55,7 +55,8 @@ void runCollectionLoop(SQLite::Database& db, int year);
 
 SQLite::Database openYearDataBase(int year);
 SQLite::Database openMainDatabase();
-void mergeCollectionAndBuildGraph(SQLite::Database& mainDB, const std::vector<std::string>& filePaths);
+bool mergeCollectionAndBuildGraph(SQLite::Database& mainDB, const std::vector<std::string>& filePaths);
+bool combineDatabaseYears(int startYear, int endYear);
 
 //=====================================================================================
 //=====================================================================================
