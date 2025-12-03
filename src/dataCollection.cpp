@@ -129,7 +129,28 @@ bool combineDatabaseYears(int startYear, int endYear) {
 			return false;
 		}
 	}
-	return mergeCollectionAndBuildGraph(mainDB, filePaths);
+	bool mergeSuccess = mergeCollectionAndBuildGraph(mainDB, filePaths);
+	if (mergeSuccess) {
+		bool deleteSuccess = true;
+		for (const std::string& path : filePaths) {
+			try {
+				// fs::remove returns true if the file was deleted, false otherwise (e.g., if it didn't exist)
+				if (std::filesystem::remove(path)) {
+					std::cout << "Successfully deleted source file: " << path << std::endl;
+				}
+				else {
+					std::cerr << "Warning: Could not delete source file: " << path << std::endl;
+					deleteSuccess = false; // Note failure but continue
+				}
+			}
+			catch (const std::filesystem::filesystem_error& e) {
+				std::cerr << "CRITICAL FILE DELETION ERROR for " << path << ": " << e.what() << std::endl;
+				return false; 
+			}
+		}
+		return mergeSuccess && deleteSuccess;
+	}
+	return mergeSuccess;
 }
 
 
